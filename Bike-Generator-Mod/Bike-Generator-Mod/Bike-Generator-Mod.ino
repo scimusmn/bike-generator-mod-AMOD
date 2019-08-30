@@ -7,7 +7,7 @@ int LedPins[] = {8, 9, 10, 11, 12, 13};  // an array of pin numbers to which LED
 const int lampCount = 6;    // the number of lights being used on each side
 bool inLedLampMode = false; //toggle to track if LED or Incandescent
 int states[6];  // the states of the 6 lights. Lit(1) or not(0).
-int clearStates[] = {1, 1, 1, 1, 1, 1};  // Array used to turn off lights on side not lit.
+int clearStates[] = {0, 0, 0, 0, 0, 0};  // Array used to turn off lights on side not lit.
 int thresholds[] = {250, 280, 310, 340, 360, 380}; // thresholds for each light.
 int hyst = 50; //hysteresis so lights turn off at a lower level they turn on.
 
@@ -15,21 +15,22 @@ void setup() {
   pinMode(15, INPUT_PULLUP); //switchPin - incandescents or LEDs
   for (int i = 0; i < lampCount; i++) { // setup incandesence
     pinMode(IncPins[i], OUTPUT);
-    digitalWrite(IncPins[i], HIGH);
+    digitalWrite(IncPins[i], HIGH);  // high turns Incandescent side off 
   }
   for (int i = 0; i < lampCount; i++) { // setup Leds
     pinMode(LedPins[i], OUTPUT);
-    digitalWrite(IncPins[i], LOW);
+    digitalWrite(IncPins[i], LOW);  // // low turns LED side off
   }
 }
 
 void loop() {
   int voltage = analogRead(generatorPin);  //read voltage of generator
+  
   for (int i = 0; i < lampCount; i++) {       // set state of each light
     if (voltage >= thresholds[i]) {     //turn on light if above threshold
-      states[i] = 0;
-    } else if (voltage < (thresholds[i] - hyst)) {  //turn off light if below hysteresis threshold
       states[i] = 1;
+    } else if (voltage < (thresholds[i] - hyst)) {  //turn off light if below hysteresis threshold
+      states[i] = 0;
     }
   }
 
@@ -50,16 +51,19 @@ void loop() {
 }
 
 void lights(int Pins[], int states[]) { //turns lights on Pins[] according to states[]
+  
+  // *** LED are ON when low but Incandesent are ON when high
+  
   for (int i = 0; i < lampCount; i++) {
     if (states[i]) {
-      if (Pins[i] > 7) { // LED are ON when low but Incandesent are ON when high
-        digitalWrite(Pins[i], LOW);
-      } else digitalWrite(Pins[i], HIGH);
+      if (Pins[i] < 8) {                  // if it's incandescent
+        digitalWrite(Pins[i], HIGH);      // set pin high for on.
+      } else digitalWrite(Pins[i], LOW);  // else, it's LED, set it low for on.
     }
     else {
-      if (Pins[i] > 7) {
-        digitalWrite(Pins[i], HIGH);
-      } else digitalWrite(Pins[i], LOW);
+      if (Pins[i] < 8) {                  // if it's incandescent
+        digitalWrite(Pins[i], LOW);       // set pin low for off.
+      } else digitalWrite(Pins[i], HIGH); // else, it's LED, set it high for off.
     }
   }
 }
