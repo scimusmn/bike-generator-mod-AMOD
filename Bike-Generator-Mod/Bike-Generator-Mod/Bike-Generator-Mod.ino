@@ -12,9 +12,8 @@ int thresholds[] = {250, 280, 310, 340, 360, 380}; // thresholds for each light.
 int hyst = 50; //hysteresis so lights turn off at a lower level they turn on.
 
 void setup() {
-  Serial.begin(9600);
   pinMode(15, INPUT_PULLUP); //switchPin - incandescents or LEDs
-  for (int i = 0; i < lampCount; i++) { // setup incandesence
+  for (int i = 0; i < lampCount; i++) { // setup incandescent
     pinMode(IncPins[i], OUTPUT);
     digitalWrite(IncPins[i], HIGH);  // high turns Incandescent side off 
   }
@@ -26,7 +25,6 @@ void setup() {
 
 void loop() {
   int voltage = analogRead(generatorPin);  //read voltage of generator
-  Serial.println(voltage);
   for (int i = 0; i < lampCount; i++) {       // set state of each light
     if (voltage >= thresholds[i]) {     //turn on light if above threshold
       states[i] = 1;
