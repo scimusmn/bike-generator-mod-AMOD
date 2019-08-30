@@ -12,29 +12,23 @@ int thresholds[] = {250, 280, 310, 340, 360, 380}; // thresholds for each light.
 int hyst = 50; //hysteresis so lights turn off at a lower level they turn on.
 
 void setup() {
-  Serial.begin(9600);
   pinMode(15, INPUT_PULLUP); //switchPin - incandescents or LEDs
   for (int i = 0; i < lampCount; i++) { // setup incandesence
     pinMode(IncPins[i], OUTPUT);
     digitalWrite(IncPins[i], HIGH);
   }
   for (int i = 0; i < lampCount; i++) { // setup Leds
-    pinMode(LedPins[i], OUTPUT);    
+    pinMode(LedPins[i], OUTPUT);
     digitalWrite(IncPins[i], LOW);
   }
-  Serial.println("bike gen mod");
-  
 }
 
 void loop() {
-  int sensorReading = analogRead(generatorPin);  //read voltage of generator
-
-  //Serial.println(sensorReading);
-  
+  int voltage = analogRead(generatorPin);  //read voltage of generator
   for (int i = 0; i < lampCount; i++) {       // set state of each light
-    if (sensorReading >= thresholds[i]) {     //turn on light if above threshold
+    if (voltage >= thresholds[i]) {     //turn on light if above threshold
       states[i] = 0;
-    } else if (sensorReading < (thresholds[i] - hyst)) {  //turn off light if below hysteresis threshold
+    } else if (voltage < (thresholds[i] - hyst)) {  //turn off light if below hysteresis threshold
       states[i] = 1;
     }
   }
@@ -58,14 +52,14 @@ void loop() {
 void lights(int Pins[], int states[]) { //turns lights on Pins[] according to states[]
   for (int i = 0; i < lampCount; i++) {
     if (states[i]) {
-      if (Pins[i] > 7){ // LED are ON when low but Incandesent are ON when high
+      if (Pins[i] > 7) { // LED are ON when low but Incandesent are ON when high
         digitalWrite(Pins[i], LOW);
-      }else digitalWrite(Pins[i], HIGH);
+      } else digitalWrite(Pins[i], HIGH);
     }
     else {
-      if (Pins[i] > 7){
+      if (Pins[i] > 7) {
         digitalWrite(Pins[i], HIGH);
-      }else digitalWrite(Pins[i], LOW);
+      } else digitalWrite(Pins[i], LOW);
     }
   }
 }
