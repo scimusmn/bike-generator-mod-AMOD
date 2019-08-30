@@ -12,6 +12,7 @@ int thresholds[] = {250, 280, 310, 340, 360, 380}; // thresholds for each light.
 int hyst = 50; //hysteresis so lights turn off at a lower level they turn on.
 
 void setup() {
+  Serial.begin(9600);
   pinMode(15, INPUT_PULLUP); //switchPin - incandescents or LEDs
   for (int i = 0; i < lampCount; i++) { // setup incandesence
     pinMode(IncPins[i], OUTPUT);
@@ -25,7 +26,7 @@ void setup() {
 
 void loop() {
   int voltage = analogRead(generatorPin);  //read voltage of generator
-  
+  Serial.println(voltage);
   for (int i = 0; i < lampCount; i++) {       // set state of each light
     if (voltage >= thresholds[i]) {     //turn on light if above threshold
       states[i] = 1;
@@ -52,18 +53,18 @@ void loop() {
 
 void lights(int Pins[], int states[]) { //turns lights on Pins[] according to states[]
   
-  // *** LED are ON when low but Incandesent are ON when high
+  // *** LED are ON when HIGH but Incandesent are OFF when HIGH
   
   for (int i = 0; i < lampCount; i++) {
     if (states[i]) {
       if (Pins[i] < 8) {                  // if it's incandescent
-        digitalWrite(Pins[i], HIGH);      // set pin high for on.
-      } else digitalWrite(Pins[i], LOW);  // else, it's LED, set it low for on.
+        digitalWrite(Pins[i], LOW);      // set pin LOW for on.
+      } else digitalWrite(Pins[i], HIGH);  // else, it's LED, set it HIGH for on.
     }
     else {
       if (Pins[i] < 8) {                  // if it's incandescent
-        digitalWrite(Pins[i], LOW);       // set pin low for off.
-      } else digitalWrite(Pins[i], HIGH); // else, it's LED, set it high for off.
+        digitalWrite(Pins[i], HIGH);       // set pin HIGH for off.
+      } else digitalWrite(Pins[i], LOW); // else, it's LED, set it LOW for off.
     }
   }
 }
